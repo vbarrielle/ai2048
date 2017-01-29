@@ -62,13 +62,14 @@ let move_left = List.map ~f:move_list
 
 let move_right grid = rev grid |> move_left |> rev
 
-let move grid = function
+let move_pure grid = function
   | Left -> move_left grid
   | Right -> move_right grid
   | Up -> List.transpose_exn grid |> move_left |> List.transpose_exn
   | Down -> List.transpose_exn grid |> move_right |> List.transpose_exn
-  |> add_random
 
+let move grid m =
+  move_pure grid m |> add_random
 
 let to_llist grid = grid
 
