@@ -1,15 +1,19 @@
 open Core.Std
 
 let rec play grid =
-  let () = printf "%s\n" (Grid.to_string grid) in
-  let move = match In_channel.input_char stdin with
-    | Some 'h' -> Grid.Left
-    | Some 'j' -> Grid.Down
-    | Some 'k' -> Grid.Up
-    | Some 'l' -> Grid.Right
-    | _ -> assert false
-  in
-  let grid = Grid.move grid move in
+  Out_channel.output_string stdout (Grid.to_string grid);
+  Out_channel.output_string stdout "\n";
+  Out_channel.flush stdout;
+  match In_channel.input_line stdin with
+    | None -> ()
+    | Some line -> match String.to_list line |> List.hd with
+      | Some 'h' -> move grid Grid.Left
+      | Some 'j' -> move grid Grid.Down
+      | Some 'k' -> move grid Grid.Up
+      | Some 'l' -> move grid Grid.Right
+      | _ -> ()
+and move grid m =
+  let grid = Grid.move grid m in
   play grid
 
 let () =
