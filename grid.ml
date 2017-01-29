@@ -48,7 +48,7 @@ let rec move_atomic = function
   | None :: Some x :: tail -> Some x :: move_atomic ( None :: tail)
   | Some x :: Some y :: tail ->
       if x = y then Some (x + y) :: move_atomic (None :: tail)
-               else Some x :: Some y :: move_atomic tail
+               else Some x :: move_atomic (Some y :: tail)
   | Some x :: None :: tail -> Some x :: move_atomic (None ::tail)
   | None :: None :: tail -> move_atomic tail @ [None; None]
 
