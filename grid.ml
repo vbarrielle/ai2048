@@ -3,6 +3,11 @@ open Utils
 
 type t = int option list list
 
+type content =
+  | Empty
+  | Free of int
+  | Locked of int
+
 let grid_size = 4
 
 let empty =
@@ -10,6 +15,23 @@ let empty =
     [ None; None; None; None ];
     [ None; None; None; None ];
     [ None; None; None; None ]; ]
+
+let map grid ~f =
+  List.map grid ~f:(fun row -> List.map row ~f)
+
+let to_content grid =
+  map grid ~f:(function
+    | Some x -> Free x
+    | None -> Empty
+  )
+
+let from_content grid =
+  map grid ~f:(function
+    | Empty -> None
+    | Free x -> Some x
+    | Locked x -> Some x
+  )
+
 
 let sample_new () =
   if Random.int 4 < 3 then Some 2 else Some 4
@@ -45,12 +67,12 @@ let rev = List.map ~f:List.rev
 
 let rec move_atomic = function
   | [] | [_] as l -> l
-  | None :: Some x :: tail -> Some x :: move_atomic ( None :: tail)
-  | Some x :: Some y :: tail ->
-      if x = y then Some (x + y) :: move_atomic (None :: tail)
-               else Some x :: move_atomic (Some y :: tail)
-  | Some x :: None :: tail -> Some x :: move_atomic (None ::tail)
-  | None :: None :: tail -> move_atomic tail @ [None; None]
+  | Empty :: tail -> (move_atomic tail) @ [Empty]
+  | Free x :: Free y :: tail ->
+      if x = y then Locked (x + y) :: move_atomic (Empty :: tail)
+               else Free x :: move_atomic (Free y :: tail)
+  | Free x :: tail -> Free x :: move_atomic tail
+  | Locked x :: tail -> Locked x :: move_atomic tail
 
 let rec move_list l =
   let l' = move_atomic l in
@@ -62,11 +84,15 @@ let move_left = List.map ~f:move_list
 
 let move_right grid = rev grid |> move_left |> rev
 
-let move_pure grid = function
+let move_pure grid m =
+  let grid = to_content grid in
+  let grid = match m with
   | Left -> move_left grid
   | Right -> move_right grid
   | Up -> List.transpose_exn grid |> move_left |> List.transpose_exn
   | Down -> List.transpose_exn grid |> move_right |> List.transpose_exn
+  in
+  from_content grid
 
 let move grid m =
   move_pure grid m |> add_random
