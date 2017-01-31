@@ -94,8 +94,22 @@ let move_pure grid m =
   in
   from_content grid
 
+let game_over grid =
+  move_pure grid Left = grid &&
+  move_pure grid Right = grid &&
+  move_pure grid Up = grid &&
+  move_pure grid Down = grid
+
 let move grid m =
-  move_pure grid m |> add_random
+  let moved = move_pure grid m in
+  if moved = grid then
+    Ok moved
+  else
+    let res = add_random moved in
+    if game_over res then
+      Error res
+    else
+      Ok res
 
 let to_llist grid = grid
 

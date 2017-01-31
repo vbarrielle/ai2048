@@ -1,4 +1,6 @@
 
+open Core.Std
+
 (** The grid type *)
 type t
 
@@ -16,7 +18,7 @@ type move =
 
 
 (** Perform a move on a grid *)
-val move : t -> move -> t
+val move : t -> move -> (t, t) Result.t
 
 (** Return the grid as a list of lists *)
 val to_llist : t -> int option list list

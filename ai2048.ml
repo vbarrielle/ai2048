@@ -13,8 +13,12 @@ let rec play grid =
       | Some 'l' -> move grid Grid.Right
       | _ -> ()
 and move grid m =
-  let grid = Grid.move grid m in
-  play grid
+  match Grid.move grid m with
+    | Ok grid -> play grid
+    | Error grid ->
+        Out_channel.output_string stdout "Sorry, you lost\n";
+        Out_channel.output_string stdout (Grid.to_string grid);
+        Out_channel.output_string stdout "\n"
 
 let () =
   let grid = Grid.new_game () in
