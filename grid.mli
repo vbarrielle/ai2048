@@ -23,4 +23,13 @@ val move : t -> move -> (t, t) Result.t
 (** Return the grid as a list of lists *)
 val to_llist : t -> int option list list
 
+(** Pretty print the grid *)
 val to_string : t -> string
+
+
+(** Evaluate the game position.
+ *
+ * The value of the position is given by the sum of the values of
+ * the grid divided by the number of non-empty cases
+ *)
+val eval_pos : t -> float

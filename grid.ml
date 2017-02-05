@@ -19,6 +19,9 @@ let empty =
 let map grid ~f =
   List.map grid ~f:(fun row -> List.map row ~f)
 
+let fold grid ~init ~f =
+  List.fold grid ~init ~f:(fun acc row -> List.fold row ~init:acc ~f)
+
 let to_content grid =
   map grid ~f:(function
     | Some x -> Free x
@@ -132,3 +135,16 @@ let to_string grid =
   |> List.intersperse ~sep:(["\n"])
   |> List.concat
   |> String.concat
+
+let eval_pos grid =
+  let sum_cases = fold grid ~init:0 ~f:(fun acc x ->
+    match x with
+      | Some y -> acc + y
+      | None -> acc
+  ) in
+  let nb_cases = fold grid ~init:0 ~f:(fun acc x ->
+    match x with
+      | Some _ -> acc + 1
+      | None -> acc
+  ) in
+  Float.of_int sum_cases /. Float.of_int nb_cases

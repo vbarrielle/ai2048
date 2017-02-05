@@ -3,6 +3,9 @@ open Core.Std
 let rec play grid =
   Out_channel.output_string stdout (Grid.to_string grid);
   Out_channel.output_string stdout "\n";
+  Out_channel.output_string stdout "Grid value: ";
+  Out_channel.output_string stdout (Grid.eval_pos grid |> Float.to_string);
+  Out_channel.output_string stdout "\n";
   Out_channel.flush stdout;
   match In_channel.input_line stdin with
     | None -> ()
