@@ -6,6 +6,8 @@ let rec play grid =
   Out_channel.output_string stdout "Grid value: ";
   Out_channel.output_string stdout (Grid.eval_pos grid |> Float.to_string);
   Out_channel.output_string stdout "\n";
+  let suggestions = Brute_force.rank_moves grid 5 in
+  Out_channel.output_string stdout (Brute_force.to_string suggestions);
   Out_channel.flush stdout;
   match In_channel.input_line stdin with
     | None -> ()
