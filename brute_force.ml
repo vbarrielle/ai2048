@@ -21,15 +21,16 @@ let enumerate_moves grid depth =
     else
       let level = level - 1 in
       match grid with
-      | Error grid -> Final (Error grid)
-      | Ok grid
+      | Grid.Game_over grid -> Final (Grid.Game_over grid)
+      | Grid.Useless grid -> Final (Grid.Useless grid)
+      | Grid.Good grid
         -> let left = do_moves (Grid.move grid Grid.Left) level in
            let right = do_moves (Grid.move grid Grid.Right) level in
            let up = do_moves (Grid.move grid Grid.Up) level in
            let down = do_moves (Grid.move grid Grid.Down) level in
            Node (left, up, right, down)
   in
-  do_moves (Ok grid) depth
+  do_moves (Grid.Good grid) depth
 
 let rec tree_depth = function
   | Final _ -> 0
@@ -46,8 +47,9 @@ let rank_moves grid depth =
   (* recursively transform the grid tree into a score tree,
    * ensuring one level remains *)
   let rec rank = function
-    | Final (Ok grid) -> Grid.eval_pos grid
-    | Final (Error grid) -> -2048.
+    | Final (Grid.Good grid) -> Grid.eval_pos grid
+    | Final (Grid.Useless grid) -> Grid.eval_pos grid
+    | Final (Grid.Game_over grid) -> -2048.
     | Node (left, right, up, down)
       -> rank left
       |> Float.max (rank right)

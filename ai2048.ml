@@ -19,8 +19,11 @@ let rec play grid =
       | _ -> ()
 and move grid m =
   match Grid.move grid m with
-    | Ok grid -> play grid
-    | Error grid ->
+    | Grid.Good grid -> play grid
+    | Grid.Useless grid ->
+        Out_channel.output_string stdout "This move is useless\n";
+        play grid
+    | Grid.Game_over grid ->
         Out_channel.output_string stdout "Sorry, you lost\n";
         Out_channel.output_string stdout (Grid.to_string grid);
         Out_channel.output_string stdout "\n"

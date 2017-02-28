@@ -66,6 +66,11 @@ type move =
   | Up
   | Down
 
+type move_res =
+  | Good of t
+  | Useless of t
+  | Game_over of t
+
 let rev = List.map ~f:List.rev
 
 let rec move_atomic = function
@@ -106,13 +111,13 @@ let game_over grid =
 let move grid m =
   let moved = move_pure grid m in
   if moved = grid then
-    Ok moved
+    Useless moved
   else
     let res = add_random moved in
     if game_over res then
-      Error res
+      Game_over res
     else
-      Ok res
+      Good res
 
 let to_llist grid = grid
 

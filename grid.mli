@@ -16,9 +16,16 @@ type move =
   | Up
   | Down
 
+(** The grid after being moved. The move can have had no effect,
+ *  have succeeded, or have caused a game over
+ *)
+type move_res =
+  | Good of t
+  | Useless of t
+  | Game_over of t
 
 (** Perform a move on a grid *)
-val move : t -> move -> (t, t) Result.t
+val move : t -> move -> move_res
 
 (** Return the grid as a list of lists *)
 val to_llist : t -> int option list list
