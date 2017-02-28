@@ -28,7 +28,7 @@ let enumerate_moves grid depth =
            let right = do_moves (Grid.move grid Grid.Right) level in
            let up = do_moves (Grid.move grid Grid.Up) level in
            let down = do_moves (Grid.move grid Grid.Down) level in
-           Node (left, up, right, down)
+           Node (left, right, up, down)
   in
   do_moves (Grid.Good grid) depth
 
