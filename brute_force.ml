@@ -17,12 +17,11 @@ let enumerate_moves grid depth =
   let () = assert (depth > 0) in
   let rec do_moves grid level =
     if level = 0 then
-      let Ok grid = grid in
       Final grid
     else
       let level = level - 1 in
       match grid with
-      | Error grid -> Final grid
+      | Error grid -> Final (Error grid)
       | Ok grid
         -> let left = do_moves (Grid.move grid Grid.Left) level in
            let right = do_moves (Grid.move grid Grid.Right) level in
@@ -55,12 +54,13 @@ let rank_moves grid depth =
       |> Float.max (rank up)
       |> Float.max (rank down)
   in
-  let Node (left, right, up, down) = grids in
-  { Move_scores.left = rank left;
-                right = rank right;
-                up = rank up;
-                down = rank down;
-  }
+  match grids with
+  | Final _ -> assert false
+  | Node (left, right, up, down)
+    -> { Move_scores.left = rank left;
+                     right = rank right;
+                     up = rank up;
+                     down = rank down; }
 
 let to_string {Move_scores.left; right; up; down} =
   sprintf "left: %f, right: %f, up: %f, down: %f" left right up down
