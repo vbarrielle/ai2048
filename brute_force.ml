@@ -23,6 +23,19 @@ module Move_scores = struct
       up = scores.up /. scalar;
       down = scores.down /. scalar;
     }
+
+  let best_move { left; right; up; down } =
+    let max_score = left |> Float.max right |> Float.max up |> Float.max down in
+    if left = max_score then
+      Grid.Left
+    else if down = max_score then
+      Grid.Down
+    else if right = max_score then
+      Grid.Right
+    else if up = max_score then
+      Grid.Up
+    else
+      assert false
 end
 
 type 'a move_tree =

@@ -153,3 +153,9 @@ let eval_pos grid =
       | None -> acc
   ) in
   Float.of_int sum_cases /. Float.of_int nb_cases
+
+let move_to_string = function
+  | Left -> "Left"
+  | Right -> "Right"
+  | Down -> "Down"
+  | Up -> "Up"

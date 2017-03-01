@@ -33,6 +33,8 @@ val to_llist : t -> int option list list
 (** Pretty print the grid *)
 val to_string : t -> string
 
+(** Pretty print a move *)
+val move_to_string: move -> string
 
 (** Evaluate the game position.
  *
