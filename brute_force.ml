@@ -7,6 +7,22 @@ module Move_scores = struct
       up: float;
       down: float;
     }
+
+  let (+) lhs rhs =
+    {
+      left = lhs.left +. rhs.left;
+      right = lhs.right +. rhs.right;
+      up = lhs.up +. rhs.up;
+      down = lhs.down +. rhs.down;
+    }
+
+  let (/) scores scalar =
+    {
+      left = scores.left /. scalar;
+      right = scores.right /. scalar;
+      up = scores.up /. scalar;
+      down = scores.down /. scalar;
+    }
 end
 
 type 'a move_tree =
@@ -41,7 +57,7 @@ let rec tree_depth = function
       |> Int.max (tree_depth down)
       |> (+) 1
 
-let rank_moves grid depth =
+let rank_moves_sample grid depth =
   let grids = enumerate_moves grid depth in
   let () = assert (tree_depth grids > 0) in
   (* recursively transform the grid tree into a score tree,
@@ -63,6 +79,15 @@ let rank_moves grid depth =
                      right = rank right;
                      up = rank up;
                      down = rank down; }
+
+let rank_moves grid ~depth ~samples =
+  let rankings = List.init samples ~f:(fun _ -> rank_moves_sample grid depth) in
+  let sum = List.fold
+    ~init:{Move_scores.left = 0.; right = 0.; up = 0.; down = 0.;}
+    ~f:Move_scores.(+)
+    rankings
+  in
+  Move_scores.(sum / (Float.of_int samples))
 
 let to_string {Move_scores.left; right; up; down} =
   sprintf "left: %f, right: %f, up: %f, down: %f" left right up down
