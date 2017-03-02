@@ -5,6 +5,9 @@ let println str =
   Out_channel.output_string stdout "\n";
   Out_channel.flush stdout
 
+let parse_cmd_int line =
+  String.slice line 1 0 |> String.strip |> Int.of_string
+
 let gen_player ?(depth=5) ?(samples=10) =
   let rec play grid =
     println (Grid.to_string grid);
@@ -23,10 +26,15 @@ let gen_player ?(depth=5) ?(samples=10) =
             if String.length line = 1 then
               auto grid ~n:100
             else
-              let n = String.slice line 1 0 |> String.strip |> Int.of_string in
+              let n = parse_cmd_int line in
               auto grid ~n
         | Some 's' ->
-          let suggestions = Brute_force.rank_moves grid ~depth ~samples in
+          let suggestions = if String.length line = 1 then
+            Brute_force.rank_moves grid ~depth ~samples
+          else
+            let depth = parse_cmd_int line in
+            Brute_force.rank_moves grid ~depth ~samples
+          in
           let move = Brute_force.Move_scores.best_move suggestions in
           println (Brute_force.to_string suggestions);
           println (Grid.move_to_string move);
