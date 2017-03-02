@@ -35,7 +35,7 @@ and auto grid ~n =
     match remaining with
     | 0 -> g
     | _ as n ->
-      let suggestions = Brute_force.rank_moves grid ~depth:5 ~samples:10 in
+      let suggestions = Brute_force.rank_moves g ~depth:5 ~samples:10 in
       let move = Brute_force.Move_scores.best_move suggestions in
       println (Brute_force.to_string suggestions);
       println (Grid.move_to_string move);
