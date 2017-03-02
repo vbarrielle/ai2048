@@ -1,3 +1,3 @@
 
-- debug weird case of brute force scoring. Moves: jljjljk. The best score
-  is for up, but this is a useless move...
+- looks like multiple collapse is wrong in game logic. eg | 2 | 2 | 2 |  |
+  gets collapsed to | 2 | 4 |  |  |
