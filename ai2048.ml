@@ -52,8 +52,24 @@ let gen_player ?(depth=5) ?(samples=10) =
   in
   play
 
+let command =
+  Command.basic
+  ~summary:"Play the 2048 game, with AI help"
+  ~readme:(fun () -> "No readme yet")
+  Command.Spec.(
+    empty
+    +> flag "-d"
+      (optional_with_default 5 int)
+      ~doc:"depth of the brute force AI"
+    +> flag "-s"
+      (optional_with_default 10 int)
+      ~doc:"number of game trees sampled by AI"
+  )
+  (fun depth samples () ->
+    let grid = Grid.new_game () in
+    let play = gen_player ~depth ~samples in
+    play grid
+  )
 
 let () =
-  let grid = Grid.new_game () in
-  let play = gen_player in
-  play grid
+  Command.run command
