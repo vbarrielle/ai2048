@@ -10,6 +10,8 @@ let gen_player ?(depth=5) ?(samples=10) =
     println (Grid.to_string grid);
     println "Grid value: ";
     println (Grid.eval_pos grid |> Float.to_string);
+    interact grid
+  and interact grid =
     match In_channel.input_line stdin with
       | None -> ()
       | Some line -> match String.to_list line |> List.hd with
@@ -17,11 +19,18 @@ let gen_player ?(depth=5) ?(samples=10) =
         | Some 'j' -> move grid Grid.Down
         | Some 'k' -> move grid Grid.Up
         | Some 'l' -> move grid Grid.Right
-        | Some 'a' -> auto grid ~n:100
+        | Some 'a' ->
+            if String.length line = 1 then
+              auto grid ~n:100
+            else
+              let n = String.slice line 1 0 |> String.strip |> Int.of_string in
+              auto grid ~n
         | Some 's' ->
           let suggestions = Brute_force.rank_moves grid ~depth ~samples in
+          let move = Brute_force.Move_scores.best_move suggestions in
           println (Brute_force.to_string suggestions);
-          play grid
+          println (Grid.move_to_string move);
+          interact grid
         | Some 'q' -> println "Exiting."
         | _ -> play grid
   and move grid m =
