@@ -77,7 +77,7 @@ let rank_moves_sample grid depth =
    * ensuring one level remains *)
   let rec rank = function
     | Final (Grid.Good grid) -> Grid.eval_pos grid
-    | Final (Grid.Useless grid) -> Grid.eval_pos grid
+    | Final (Grid.Useless grid) -> -4096.
     | Final (Grid.Game_over grid) -> -2048.
     | Node (left, right, up, down)
       -> rank left

@@ -19,7 +19,7 @@ let rec play grid =
       | Some 'j' -> move grid Grid.Down
       | Some 'k' -> move grid Grid.Up
       | Some 'l' -> move grid Grid.Right
-      | Some 'a' -> auto grid ~n:10
+      | Some 'a' -> auto grid ~n:100
       | _ -> ()
 and move grid m =
   match Grid.move grid m with
