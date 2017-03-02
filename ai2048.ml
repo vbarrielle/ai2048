@@ -54,7 +54,9 @@ let gen_player ?(depth=5) ?(samples=10) =
         match Grid.move g move with
         | Grid.Good grid -> auto_play grid (n - 1)
         | Grid.Useless grid -> assert false
-        | Grid.Game_over grid -> assert false
+        | Grid.Game_over grid ->
+            println "Automatic play encountered game over";
+            grid
     in
     let res = auto_play grid n in
     play res

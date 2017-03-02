@@ -159,3 +159,10 @@ let move_to_string = function
   | Right -> "Right"
   | Down -> "Down"
   | Up -> "Up"
+
+let highest grid =
+  fold grid ~init:0 ~f:(fun max x ->
+    match x with
+    | Some y -> Int.max max y
+    | None -> max
+  )

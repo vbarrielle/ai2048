@@ -42,3 +42,6 @@ val move_to_string: move -> string
  * the grid divided by the number of non-empty cases
  *)
 val eval_pos : t -> float
+
+(** Value of the highest grid entry *)
+val highest : t -> int
