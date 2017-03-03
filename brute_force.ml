@@ -1,12 +1,9 @@
 open Core.Std
 
+type 'a moves = {left: 'a; right: 'a; up: 'a; down: 'a}
+
 module Move_scores = struct
-  type t =
-    { left: float;
-      right: float;
-      up: float;
-      down: float;
-    }
+  type t = float moves
 
   let (+) lhs rhs =
     {
@@ -39,7 +36,7 @@ module Move_scores = struct
 end
 
 type 'a move_tree =
-  | Node of 'a move_tree * 'a move_tree * 'a move_tree * 'a move_tree
+  | Node of ('a move_tree) moves
   | Final of 'a
 
 let enumerate_moves grid depth =
@@ -57,13 +54,13 @@ let enumerate_moves grid depth =
            let right = do_moves (Grid.move grid Grid.Right) level in
            let up = do_moves (Grid.move grid Grid.Up) level in
            let down = do_moves (Grid.move grid Grid.Down) level in
-           Node (left, right, up, down)
+           Node {left; right; up; down}
   in
   do_moves (Grid.Good grid) depth
 
 let rec tree_depth = function
   | Final _ -> 0
-  | Node (left, right, up, down) ->
+  | Node {left; right; up; down} ->
       tree_depth left
       |> Int.max (tree_depth right)
       |> Int.max (tree_depth up)
@@ -79,28 +76,25 @@ let rank_moves_sample grid depth =
     | Final (Grid.Good grid) -> Grid.eval_pos grid
     | Final (Grid.Useless grid) -> -4096.
     | Final (Grid.Game_over grid) -> -2048.
-    | Node (left, right, up, down)
-      -> rank left
+    | Node {left; right; up; down} ->
+      rank left
       |> Float.max (rank right)
       |> Float.max (rank up)
       |> Float.max (rank down)
   in
   match grids with
   | Final _ -> assert false
-  | Node (left, right, up, down)
-    -> { Move_scores.left = rank left;
-                     right = rank right;
-                     up = rank up;
-                     down = rank down; }
+  | Node {left; right; up; down} ->
+    { left = rank left; right = rank right; up = rank up; down = rank down; }
 
 let rank_moves grid ~depth ~samples =
   let rankings = List.init samples ~f:(fun _ -> rank_moves_sample grid depth) in
   let sum = List.fold
-    ~init:{Move_scores.left = 0.; right = 0.; up = 0.; down = 0.;}
+    ~init:{left = 0.; right = 0.; up = 0.; down = 0.;}
     ~f:Move_scores.(+)
     rankings
   in
   Move_scores.(sum / (Float.of_int samples))
 
-let to_string {Move_scores.left; right; up; down} =
+let to_string {left; right; up; down} =
   sprintf "left: %f, right: %f, up: %f, down: %f" left right up down
