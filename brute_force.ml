@@ -67,7 +67,6 @@ let rec tree_depth = function
       |> Int.max (tree_depth down)
       |> (+) 1
 
-
 (** Rank a game tree as the value of the best future grid *)
 let rec rank_tree_max = function
   | Final (Grid.Good grid) -> Grid.eval_pos grid
@@ -79,10 +78,34 @@ let rec rank_tree_max = function
     |> Float.max (rank_tree_max up)
     |> Float.max (rank_tree_max down)
 
+let rank_tree_mean2max = function
+  | Final (Grid.Good grid) -> Grid.eval_pos grid
+  | Final (Grid.Useless grid) -> -4096.
+  | Final (Grid.Game_over grid) -> -2048.
+  | Node {left; right; up; down} ->
+    let sorted_scores =
+      List.map [left; right; up; down] ~f:rank_tree_max
+      |> List.sort ~cmp:Float.compare
+      |> List.rev
+    in
+    let best = List.hd_exn sorted_scores in
+    let snd = List.hd_exn @@ List.tl_exn sorted_scores in
+    Float.((best + snd) * 0.5)
+
+let rec rank_tree_max_empty = function
+  | Final (Grid.Good grid) -> Float.of_int @@ Grid.nb_empty grid
+  | Final (Grid.Useless grid) -> -4096.
+  | Final (Grid.Game_over grid) -> -2048.
+  | Node {left; right; up; down} ->
+    rank_tree_max_empty left
+    |> Float.max (rank_tree_max_empty right)
+    |> Float.max (rank_tree_max_empty up)
+    |> Float.max (rank_tree_max_empty down)
+
 let rank_moves_sample grid depth =
   let grids = enumerate_moves grid depth in
   let () = assert (tree_depth grids > 0) in
-  let rank = rank_tree_max in
+  let rank = rank_tree_max_empty in
   match grids with
   | Final _ -> assert false
   | Node {left; right; up; down} ->

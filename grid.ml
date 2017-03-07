@@ -141,17 +141,24 @@ let to_string grid =
   |> List.concat
   |> String.concat
 
+let nb_full grid =
+  fold grid ~init:0 ~f:(fun acc x ->
+    match x with
+      | Some _ -> acc + 1
+      | None -> acc
+  )
+
+let nb_empty grid =
+  let grid_size = List.length grid in
+  (grid_size * grid_size) - (nb_full grid)
+
 let eval_pos grid =
   let sum_cases = fold grid ~init:0 ~f:(fun acc x ->
     match x with
       | Some y -> acc + y
       | None -> acc
   ) in
-  let nb_cases = fold grid ~init:0 ~f:(fun acc x ->
-    match x with
-      | Some _ -> acc + 1
-      | None -> acc
-  ) in
+  let nb_cases = nb_full grid in
   Float.of_int sum_cases /. Float.of_int nb_cases
 
 let move_to_string = function
