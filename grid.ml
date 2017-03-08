@@ -37,7 +37,7 @@ let from_content grid =
 
 
 let sample_new () =
-  if Random.int 4 < 3 then Some 2 else Some 4
+  if Random.float 1. <. 0.9 then Some 2 else Some 4
 
 let add_random grid =
   let nb_none = List.fold ~init:0 ~f:(+) (
