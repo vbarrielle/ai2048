@@ -5,13 +5,15 @@ type 'a moves = {left: 'a; right: 'a; up: 'a; down: 'a}
 module Move_scores = struct
   type t = float moves
 
-  let (+) lhs rhs =
+  let map2 ~f lhs rhs =
     {
-      left = lhs.left +. rhs.left;
-      right = lhs.right +. rhs.right;
-      up = lhs.up +. rhs.up;
-      down = lhs.down +. rhs.down;
+      left = f lhs.left rhs.left;
+      right = f lhs.right rhs.right;
+      up = f lhs.up rhs.up;
+      down = f lhs.down rhs.down;
     }
+
+  let (+) = map2 ~f:(+.)
 
   let (/) scores scalar =
     {
@@ -111,14 +113,26 @@ let rank_moves_sample grid depth =
   | Node {left; right; up; down} ->
     { left = rank left; right = rank right; up = rank up; down = rank down; }
 
-let rank_moves grid ~depth ~samples =
-  let rankings = List.init samples ~f:(fun _ -> rank_moves_sample grid depth) in
+let aggregate_mean rankings =
   let sum = List.fold
     ~init:{left = 0.; right = 0.; up = 0.; down = 0.;}
     ~f:Move_scores.(+)
     rankings
   in
-  Move_scores.(sum / (Float.of_int samples))
+  Move_scores.(sum / (Float.of_int @@ List.length rankings))
+
+let aggregate_min rankings =
+  let max = 4096. in
+  let min = List.fold
+    ~init:{left = max; right = max; up = max; down = max;}
+    ~f:(Move_scores.map2 ~f:Float.min)
+    rankings
+  in
+  min
+
+let rank_moves grid ~depth ~samples =
+  let rankings = List.init samples ~f:(fun _ -> rank_moves_sample grid depth) in
+  aggregate_mean rankings
 
 let to_string {left; right; up; down} =
   sprintf "left: %f, right: %f, up: %f, down: %f" left right up down
