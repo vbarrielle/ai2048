@@ -87,6 +87,7 @@ let command =
       ~doc:"number of game trees sampled by AI"
   )
   (fun depth samples () ->
+    Random.self_init ();
     let grid = Grid.new_game () in
     let play = gen_player ~depth ~samples in
     play grid
