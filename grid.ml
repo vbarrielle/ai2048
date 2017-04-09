@@ -1,7 +1,8 @@
 open Core.Std
 open Utils
 
-type t = int option list list
+type grid = int option list list
+type t = {grid: grid; score: float}
 
 type content =
   | Empty
@@ -58,7 +59,8 @@ let add_random grid =
   ) |> snd
 
 let new_game () =
-  empty |> add_random |> add_random
+  let grid = empty |> add_random |> add_random in
+  {grid; score = 0.0 }
 
 type move =
   | Left
@@ -108,20 +110,20 @@ let game_over grid =
   move_pure grid Up = grid &&
   move_pure grid Down = grid
 
-let move grid m =
+let move {grid; score} m =
   let moved = move_pure grid m in
   if moved = grid then
-    Useless moved
+    Useless {grid = moved; score}
   else
     let res = add_random moved in
     if game_over res then
-      Game_over res
+      Game_over {grid = res; score}
     else
-      Good res
+      Good {grid = res; score}
 
-let to_llist grid = grid
+let to_llist {grid; score} = grid
 
-let to_string grid =
+let to_string {grid; score} =
   let strings = List.map grid ~f:(
     List.map ~f:(function
       | None -> ""
@@ -148,11 +150,11 @@ let nb_full grid =
       | None -> acc
   )
 
-let nb_empty grid =
+let nb_empty {grid; score} =
   let grid_size = List.length grid in
   (grid_size * grid_size) - (nb_full grid)
 
-let eval_pos grid =
+let eval_pos {grid; score} =
   let sum_cases = fold grid ~init:0 ~f:(fun acc x ->
     match x with
       | Some y -> acc + y
@@ -167,7 +169,7 @@ let move_to_string = function
   | Down -> "Down"
   | Up -> "Up"
 
-let highest grid =
+let highest {grid; score} =
   fold grid ~init:0 ~f:(fun max x ->
     match x with
     | Some y -> Int.max max y
