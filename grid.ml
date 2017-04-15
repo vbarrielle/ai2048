@@ -102,24 +102,29 @@ let move_pure grid m =
   | Up -> List.transpose_exn grid |> move_left |> List.transpose_exn
   | Down -> List.transpose_exn grid |> move_right |> List.transpose_exn
   in
-  from_content grid
+  let merged_scores = fold grid ~init:0 ~f:(fun acc value ->
+    match value with
+    | Locked x -> acc + x
+    | _ -> acc
+  ) in
+  from_content grid, (Float.of_int merged_scores)
 
 let game_over grid =
-  move_pure grid Left = grid &&
-  move_pure grid Right = grid &&
-  move_pure grid Up = grid &&
-  move_pure grid Down = grid
+  move_pure grid Left |> fst = grid &&
+  move_pure grid Right |> fst = grid &&
+  move_pure grid Up |> fst = grid &&
+  move_pure grid Down |> fst = grid
 
 let move {grid; score} m =
-  let moved = move_pure grid m in
+  let moved, merged_scores = move_pure grid m in
   if moved = grid then
     Useless {grid = moved; score}
   else
     let res = add_random moved in
     if game_over res then
-      Game_over {grid = res; score}
+      Game_over {grid = res; score = score +. merged_scores}
     else
-      Good {grid = res; score}
+      Good {grid = res; score = score +. merged_scores}
 
 let to_llist {grid; score} = grid
 
