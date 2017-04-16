@@ -36,12 +36,19 @@ val to_string : t -> string
 (** Pretty print a move *)
 val move_to_string: move -> string
 
-(** Evaluate the game position.
+(** Evaluate the game score.
+ *
+ * The game score is history based, it is the sum of the values of
+ * all tiles created by a merge.
+ *)
+val eval_pos : t -> float
+
+(** Evaluate the game position using a heuristic.
  *
  * The value of the position is given by the sum of the values of
  * the grid divided by the number of non-empty cases
  *)
-val eval_pos : t -> float
+val heuristic_eval_pos : t -> float
 
 (** Value of the highest grid entry *)
 val highest : t -> int

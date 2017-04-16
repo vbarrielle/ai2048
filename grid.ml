@@ -159,7 +159,7 @@ let nb_empty {grid; score} =
   let grid_size = List.length grid in
   (grid_size * grid_size) - (nb_full grid)
 
-let eval_pos {grid; score} =
+let heuristic_eval_pos {grid; score} =
   let sum_cases = fold grid ~init:0 ~f:(fun acc x ->
     match x with
       | Some y -> acc + y
@@ -167,6 +167,9 @@ let eval_pos {grid; score} =
   ) in
   let nb_cases = nb_full grid in
   Float.of_int sum_cases /. Float.of_int nb_cases
+
+let eval_pos {score; } =
+  score
 
 let move_to_string = function
   | Left -> "Left"
