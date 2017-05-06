@@ -107,7 +107,7 @@ let rec rank_tree_max_empty = function
 let rank_moves_sample grid depth =
   let grids = enumerate_moves grid depth in
   let () = assert (tree_depth grids > 0) in
-  let rank = rank_tree_max_empty in
+  let rank = rank_tree_max in
   match grids with
   | Final _ -> assert false
   | Node {left; right; up; down} ->
