@@ -58,6 +58,13 @@ let add_random grid =
     (count, row' :: res)
   ) |> snd
 
+let empty_locations {grid} =
+  fold grid ~init:(0, []) ~f:(fun (id, locs) elem ->
+    match elem with
+    | None -> (id + 1, id::locs)
+    | _ -> (id + 1, locs)
+  ) |> snd
+
 let new_game () =
   let grid = empty |> add_random |> add_random in
   {grid; score = 0.0 }

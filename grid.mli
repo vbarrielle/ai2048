@@ -36,6 +36,11 @@ val to_string : t -> string
 (** Pretty print a move *)
 val move_to_string: move -> string
 
+(** Get a list of empty locations on a grid. Each location
+ * is the index of the empty case in the row-major ordering of the
+ * grid. *)
+val empty_locations: t -> int list
+
 (** Evaluate the game score.
  *
  * The game score is history based, it is the sum of the values of
