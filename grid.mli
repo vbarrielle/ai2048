@@ -41,6 +41,13 @@ val move_to_string: move -> string
  * grid. *)
 val empty_locations: t -> int list
 
+(** Add the specified tile in the specified location in the grid,
+ *  overwriting any value present before. The indexing convention
+ *  corresponds to the convention used in `empty_locations`. Together,
+ *  these functions can be used to add a tile in an empty location.
+ *)
+val add_tile: t -> loc:int -> tile:int option -> t
+
 (** Evaluate the game score.
  *
  * The game score is history based, it is the sum of the values of

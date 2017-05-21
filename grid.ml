@@ -40,30 +40,44 @@ let from_content grid =
 let sample_new () =
   if Random.float 1. <. 0.9 then Some 2 else Some 4
 
-let add_random grid =
-  let nb_none = List.fold ~init:0 ~f:(+) (
-      List.map ~f:(List.count ~f:Option.is_none) grid
-  ) in
-  (* FIXME can this be used for end of game detection? *)
-  let () = assert (nb_none > 0) in
-  let new_id = Random.int nb_none in
-  List.fold_right grid ~init:(0, []) ~f:(fun row (count, res) ->
-    let (count, row') =
-      List.fold_right row ~init:(count, []) ~f:( fun elem (c, r) ->
-        match elem with
-        | None -> if c = new_id then (c + 1, sample_new () :: r)
-                                else (c + 1, None :: r)
-        | _ as x -> ( c, x :: r)
-    ) in
-    (count, row' :: res)
-  ) |> snd
-
 let empty_locations {grid} =
   fold grid ~init:(0, []) ~f:(fun (id, locs) elem ->
     match elem with
     | None -> (id + 1, id::locs)
     | _ -> (id + 1, locs)
-  ) |> snd
+  ) |> snd |> List.rev
+
+let add_tile {grid; score} ~loc ~tile =
+  let loc = 15 - loc in (* fold_right inverts the order *)
+  let grid' =
+    List.fold_right grid ~init:(0, []) ~f:(fun row (count, res) ->
+      let (count, row') =
+        List.fold_right row ~init:(count, []) ~f:(fun elem (c, r) ->
+          if c = loc then (c + 1, tile :: r) else ( c + 1, elem :: r)
+        )
+      in
+      (count, row' :: res)
+    ) |> snd
+  in {grid = grid'; score}
+
+let add_random grid =
+  let empty_locs = empty_locations {grid; score = 0.} in
+  let nb_none = List.length empty_locs in
+  (* FIXME can this be used for end of game detection? *)
+  let () = assert (nb_none > 0) in
+  let new_id = Random.int nb_none in
+  let loc = List.nth_exn empty_locs new_id in
+  let tile = sample_new () in
+  (* let () = (
+    printf "emtpy locs:";
+    List.iter empty_locs ~f:(printf " %d");
+    printf "\n";
+    printf "loc index: %d\n" new_id;
+    printf "chosen loc: %d\n" loc;
+  ) in *)
+  let {grid} = add_tile {grid; score = 0.} ~loc ~tile in
+  (* FIXME something is wrong, overwriting non-empty tile... *)
+  grid
 
 let new_game () =
   let grid = empty |> add_random |> add_random in
